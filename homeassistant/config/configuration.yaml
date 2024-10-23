@@ -1,0 +1,17 @@
+# Basic configuration
+homeassistant:
+  name: Test Home
+  latitude: 36.33283549003594
+  longitude: -82.34808480137606
+  elevation: 450
+  unit_system: imperial
+  currency: USD
+  temperature_unit: F
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Include external configuration files
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

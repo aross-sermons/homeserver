@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"  # Portainer web UI port
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Allows Portainer to communicate with the Docker daemon
+      - ./portainer_data:/data  # Stores Portainer data
+
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host  # Allows Home Assistant to directly communicate with decives on the host's network
+    volumes:
+      - ./homeassistant/config:/config  # Home Assistant configuration files
+
+  sharepoint:
+    build: ./sharepoint
+    container_name: sharepoint
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./sharepoint/config:/app/config  # Sharepoint configuration files
+
+  mopidy:
+    image: mopidy/mopidy
+    container_name: mopidy
+    restart: unless-stopped
+    ports:
+      - "6680:6680"  # Mopidy web UI port
+    volumes:
+      - ./mopidy/config:/config  # Mopidy configuration files
+      - ./mopidy/data:/var/lib/mopidy  # Mopidy data
+      - ./mopidy/cache:/var/cache/mopidy  # Mopidy cache
+      - ./tmp/snapfifo:/tmp/snapfifo  # Where Mopidy sends audio to Snapserver
+
+  snapserver:
+    image: bastibe/snapserver
+    container_name: snapserver
+    restart: unless-stopped
+    ports:
+      - "1704:1704"  # SnapCast audio streaming port
+      - "1705:1705"  # SnapCast control port
+      - "1780:1780"  # SnapCast web UI port
+    volumes:
+      - ./snapserver/config:/config  # Snapserver configuration files
+      - ./tmp/snapfifo:/tmp/snapfifo # Where Snapserver looks for audio
+
+volumes:
+  portainer_data:
+
